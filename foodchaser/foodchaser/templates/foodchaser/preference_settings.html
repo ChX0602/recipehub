@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Taste Preference</title>
+
+
+    <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+
+  <!-- Those are for the use of autocomplete form -->
+  <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/themes/base/jquery-ui.css" type="text/css">
+  <link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}css/dj.selectable.css" />
+
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
+  <script src="{{ STATIC_URL }}js/jquery.dj.selectable.js"></script>
+  <link href="{{ STATIC_URL }}font-awesome-4.2.0/css/font-awesome.min.css" rel="stylesheet">
+  <link href="{{ STATIC_URL }}css/customCSS.css" rel="stylesheet">
+
+  <!-- Latest compiled and minified JavaScript -->
+  <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/demo.css" />
+  <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/style.css" />
+  <script type="text/javascript" src="{{STATIC_URL}}js/modernizr.custom.04022.js"></script>
+
+  <!-- JS files -->
+  <script src="{{STATIC_URL}}js/check.js"></script>
+
+</head>
+
+ <!-- A script for autocomplete tabs -->
+
+   <script type="text/javascript">
+    $(document).ready(function() {
+        $(':input[name=my_field_0]').bind('djselectableselect', function(event, ui) {
+            $(this).parents("form").submit();
+
+        }
+        );
+
+        function newParameters(query) {
+          query.category1 = $('#id_category1').val();
+          query.category2 = $('#id_category2').val();
+        }
+
+        $('#id_autocomplete').djselectable('option', 'prepareQuery', newParameters);
+
+        function formatLabel(label, item) {
+            var data = label;
+            return '<img src="/foodchaser/recipe/photo/' + item.id + '" height="42" width="42"/>' + label;
+        }
+
+        $('#id_autocomplete').djselectable('option', 'formatLabel', formatLabel);
+    });
+  </script>
+  <div nav>
+      <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+          
+        <div class="container navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class ="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{% url 'home' %}">RecipeHub</a>
+        </div>
+             <div class="navbar-right">
+              <div class="navbar-collapse collapse">
+                  <ul class="nav navbar-nav navbar-left">
+
+                      <li><a href="{% url 'recommend' %}" class="fa fa-spoon fa-lg" data-toggle="tooltip" data-placement="bottom" title="Recommend"></a></li>
+
+                      <li><a href="{% url 'recipebox_maindish' %}" class="fa fa-book fa-lg" data-toggle="tooltip" data-placement="bottom" title="Recipe Box"></a></li>
+
+                      <li><a href="{% url 'get_planner' %}" class="fa fa-calendar-o fa-lg" data-toggle="tooltip" data-placement="bottom" title="Menu Planner"></a></li>
+
+                      <li><a href="{% url 'add_recipe' %}" class="fa fa-plus-square-o fa-lg" data-toggle="tooltip" data-placement="bottom" title="Add a Recipe"></a></li>
+                      
+                      <script type="text/javascript">
+                      $('a').tooltip();
+                      </script> 
+                      <li class="dropdown">
+                          <a href="#" class="dropdown-toggle" data-toggle="dropdown">More<b class="caret"></b></a>
+                          <ul class="dropdown-menu">
+                              <li class="dropdown-header">Settings</li>
+                              <li><a href="#">Privacy Settings</a></li>
+                              <li><a href="#">Custom Settings</a></li>
+                              <li class="divider"></li>
+                              
+                              <li class="dropdown-header">Help</li>
+                              <li><a href="#">User Guide</a></li>
+                              <li><a href="#">Contact Us</a></li>
+                              <li class="divider"></li>
+                              
+                              <li class="dropdown-header">Actions</li>
+                              <li><a href="#">Switch User</a></li>
+                              <li><a href="/foodchaser/logout">Log Out</a></li>
+                              <li><a href="/foodchaser/changepassword">Change my password</a></li>
+                          </ul>
+                      </li>
+                  </ul>
+                  
+                      <form class="navbar-form navbar-right" method="get" action="{% url 'search' %}" method="post">
+                        {{autocompleteform}}
+                      </form>
+
+              </div>
+          </div>
+      </div>
+  </div>
+<body onload="makeCheck()">
+
+<!-- Tab panes -->
+<div class="container">
+  <div class="col-lg-4 centered">
+    <ul id="myTab" class="nav nav-tabs">
+      <li class="active"><a href="#profile" data-toggle="tab">Profile</a></li>
+      <li><a href="#taste_preference " data-toggle="tab">Taste Preference</a></li>
+      <li><a href="#settings" data-toggle="tab">Settings</a></li>
+    </ul>
+    <div id="myTabContent" class="tab-content">
+      <div class="tab-pane fade in active" id="profile">
+        <br>
+        <div class="panel panel-default">
+          <div class="panel-heading">Profile</div>
+          <div class="panel-body">
+            <form id="profileform" role="form" action="/foodchaser/changemyprofile" method="post">
+              <div class="form-group">
+                <label for="first_name">First Name</label>
+                <input type="text" class="form-control" id="first_name" placeholder="first name" name="first_name">
+                <br>
+                <label for="last_name">Last Name</label>
+                <input type="text" class="form-control" id="last_name" placeholder="last name" name="last_name">
+                <br>
+                <label>Gender</label>
+                <select name="gender" form="profileform">
+                  <option> </option>
+                  <option value="female">Female</option>
+                  <option value="male">Male</option>
+                </select>
+
+                <br>
+                <br>
+                <label for="city">City</label>
+                <input type="text" class="form-control" name="city" id="city" placeholder="City">
+                <br>
+                <label for="state">State/Province/Region</label>
+                <input type="text" class="form-control" id="state" name="state" placeholder="State">
+                <br>
+                <label for="country">Country</label>
+                <input type="text" class="form-control" name="country" id="country" placeholder="Country">
+                <br>
+                <label for="description">Description</label>
+                <textarea class="form-control" name="description" id="description" placeholder="Tell people about yourself..."></textarea>
+                <br>
+                <button type="submit" class="btn btn-primary">Save</button>
+                {% csrf_token %}
+              </div>
+            </form>
+          </div>
+          
+        </div>
+        
+      </div>
+      <div class="tab-pane fade" id="taste_preference">
+      <br>
+        <div class="panel panel-default">
+          <div class="panel-heading">Taste Preference</div>
+          <div class="panel-body">
+              <br>
+              <form role="form" action="{% url 'dislike' %}" method="post">
+              <label>Disliked Ingredients</label>
+              <ul>
+                {% for ingredient in dislikes %}
+                <li> {{ ingredient.name }}
+                {% endfor %}
+              </ul>
+                <div>
+                    <input type="text" class="form-control" placeholder="search an ingredient" name="ingredient">
+                </div>
+                <br>
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">Add</button>
+              </form>
+              <br>
+              <form role="form" action="{% url 'preference' %}" method="post">
+              <label>Vegetarian and Allergies</label>
+              {% for field in allergyForm.visible_fields %}
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" name="{{field.name}}" value="{{field.value}}" onclick="checkState(this)"> {{field.label}}
+                </label>
+              </div>
+              {% endfor %}
+              <br>
+              {% csrf_token %}
+              <button type="submit" class="btn btn-primary">Save</button>
+            </form>
+          </div>
+          
+        </div>
+      </div>
+      <div class="tab-pane fade" id="settings">
+      <br>
+        <div class="panel panel-default">
+          <div class="panel-heading">Settings</div>
+          <div class="panel-body">
+            <form role="form">
+              <div class="form-group">
+                <button class="btn btn-default">Change Password</button>
+                <br>
+                <br>
+                <label for="change_email">Change Email</label>
+                <input type="email" class="form-control" id="change_email" placeholder="current email">
+              </div>
+              <button type="submit" class="btn btn-primary">Save</button>
+            </form>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+
+
+
+<!-- <div class="navbar navbar-default navbar-fixed-bottom" role="navigation">
+          <div class="container">
+              <div class="navbar-text pull-left">
+                  <p>This is a footer for future use</p>
+              </div>
+          </div>
+      </div> -->
+    
+</html>

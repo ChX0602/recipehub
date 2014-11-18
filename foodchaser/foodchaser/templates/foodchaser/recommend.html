@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>Recommendations</title>
+
+
+    <!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+
+	<!-- Those are for the use of autocomplete form -->
+	<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/themes/base/jquery-ui.css" type="text/css">
+	<link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}css/dj.selectable.css" />
+
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
+	<script src="{{ STATIC_URL }}js/jquery.dj.selectable.js"></script>
+
+	<!-- Latest compiled and minified JavaScript -->
+	<link href="{{STATIC_URL}}font-awesome-4.2.0/css/font-awesome.min.css" rel="stylesheet">
+	<link href="{{STATIC_URL}}css/customCSS.css" rel="stylesheet">
+
+  </head>
+
+   <!-- A script for autocomplete tabs -->
+
+   <script type="text/javascript">
+    $(document).ready(function() {
+        $(':input[name=my_field_0]').bind('djselectableselect', function(event, ui) {
+            $(this).parents("form").submit();
+
+        }
+        );
+
+        function newParameters(query) {
+        	query.category1 = $('#id_category1').val();
+        	query.category2 = $('#id_category2').val();
+        }
+
+        $('#id_autocomplete').djselectable('option', 'prepareQuery', newParameters);
+
+        function formatLabel(label, item) {
+            var data = label;
+            return '<img src="/foodchaser/recipe/photo/' + item.id + '" height="42" width="42"/>' + label;
+        }
+
+        $('#id_autocomplete').djselectable('option', 'formatLabel', formatLabel);
+    });
+	</script>
+	
+  <div nav>
+      <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+          
+	      <div class="container navbar-header">
+	          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	              <span class ="sr-only">Toggle navigation</span>
+	              <span class="icon-bar"></span>
+	              <span class="icon-bar"></span>
+	              <span class="icon-bar"></span>
+	          </button>
+	          {% if logged_in == True %}
+	          <a class="navbar-brand" href="/foodchaser/userhome">RecipeBox</a>
+	          {% endif %}
+
+	          {% if logged_in == False %}
+	          <a class="navbar-brand" href="/">RecipeBox</a>
+	          {% endif %}
+	      </div>
+             <div class="navbar-right">
+              <div class="navbar-collapse collapse">
+                  <ul class="nav navbar-nav navbar-left">
+
+                      {% if logged_in == True %}
+                      <li class="active"><a href="recommend" class="fa fa-spoon fa-lg" data-toggle="tooltip" data-placement="bottom" title="Recommend"></a></li>
+                      {% endif %}
+
+                      {% if logged_in == False %}
+                      <li><a class="fa fa-spoon fa-lg" data-placement="bottom" title="Recommend" data-toggle="modal" data-target="#myModal"></a></li>
+					  {% endif %}
+
+
+                      {% if logged_in == True %}
+                      <li><a href="userhome" class="fa fa-book fa-lg" data-toggle="tooltip" data-placement="bottom" title="Recipe Box"></a></li>
+                      {% endif %}
+
+                      {% if logged_in == False %}
+                      <li><a class="fa fa-book fa-lg" data-toggle="modal" data-target="#myModal" data-placement="bottom" title="Recipe Box"></a></li>
+					  {% endif %}
+
+                      {% if logged_in == True %}
+                      <li><a href="{% url 'get_planner' %}" class="fa fa-calendar-o fa-lg" data-toggle="tooltip" data-placement="bottom" title="Menu Planner"></a></li>
+                      {% endif %}
+
+                      {% if logged_in == False %}
+                      <li><a class="fa fa-calendar-o fa-lg" data-toggle="modal" data-target="#myModal" data-placement="bottom" title="Menu Planner"></a></li>
+					  {% endif %}
+
+                      {% if logged_in == True %}					  
+                      <li><a href="add_recipe" class="fa fa-plus-square-o fa-lg" data-toggle="tooltip" data-placement="bottom" title="Add a Recipe"></a></li>
+					  {% endif %}
+
+					  {% if logged_in == False %}
+                      <li><a class="fa fa-plus-square-o fa-lg" data-placement="bottom" data-toggle="modal" data-target="#myModal" title="Add a Recipe"></a></li>
+					  {% endif %}
+
+
+                      
+                      <script type="text/javascript">
+                      $('a').tooltip();
+                      </script> 
+                      <li class="dropdown">
+                          <a href="#" class="dropdown-toggle" data-toggle="dropdown">More<b class="caret"></b></a>
+                          <ul class="dropdown-menu">
+                              <li class="dropdown-header">Settings</li>
+                              <li><a href="#">Preference Settings</a></li>
+                              <li><a href="#">Privacy Settings</a></li>
+                              <li><a href="#">Custom Settings</a></li>
+                              <li class="divider"></li>
+                              
+                              <li class="dropdown-header">Help</li>
+                              <li><a href="#">User Guide</a></li>
+                              <li><a href="#">Contact Us</a></li>
+                              <li class="divider"></li>
+                              
+                              <li class="dropdown-header">Actions</li>
+                              <li><a href="#">Switch User</a></li>
+                              <li><a href="/foodchaser/logout">Log Out</a></li>
+                              <li><a href="/foodchaser/changepassword">Change my password</a></li>
+                          </ul>
+                      </li>
+                  </ul>
+                  
+                      <form class="navbar-form navbar-right" method="get" action="{% url 'search' %}" method="post">
+                      	{{autocompleteform}}
+                      </form>
+
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <!-- Nav bar ends-->
+<body>
+	
+	{% if logged_in == True %}
+	<!--
+	<div class="media" id="profile_block">
+	  <a class="media-left media-middle" href="#">
+	    <img src="{{STATIC_URL}}img/default_user.png" alt="..." height="150px" width="150px">
+
+	  </a>
+	  <div class="media-body">
+	    <h1 class="media-heading">{{user}}</h1>
+
+	    <p>Rank : Beginner</p>
+	    <a href="settings">Change preference</a>
+	    <br>
+	  	<a href="virtual_restaurant">View my restaurant</a>
+	  </div>
+	</div>
+-->
+	<div class="row" id="profile_block">
+	  <a class="col-xs-2 col-md-2 col-xs-offset-4 col-md-offset-4" href="#">
+	    <img src="{{STATIC_URL}}img/default_user.png" alt="..." height="150px" width="150px">
+	  </a>
+	  <div class="container col-xs-2 col-md-2">
+	    <h3>{{user}}</h3>
+
+	    <h4>Rank : Beginner</h4>
+	    <h4><a href="settings">Change preference</a></h4>
+	  	<h4><a href="virtual_restaurant">View my restaurant</a></h4>
+	  </div>
+	</div>
+
+	<ul class="nav nav-tabs nav-justified" role="tablist">
+		<li role="presentation" class="active"><a href="/foodchaser/recommend">Recommendations</a></li>
+		<li role="presentation"><a href="{% url 'home' %}">Recipe Box</a></li>
+	  	<li role="presentation"><a href="{% url 'get_planner' %}">Menu Planner</a></li>
+	</ul>
+	{% endif %}
+
+	<!-- the second nav bar ends, put content below-->
+	<div class="panel panel-default">
+		<div class="panel-heading"><h3>Top Recommended    <a>More</a></h3></div>
+		<div class="panel-body">
+		<div class="row">
+		  <div class="col-sm-3 col-md-2">
+		    <div class="thumbnail">
+		      <img src="{{STATIC_URL}}img/chaomian.jpg" alt="...">
+		      <div class="caption">
+		        <h3>Chow mein</h3>
+		        <p>Short description of the dish</p>
+		        <p>From <a>Xing Chen</a></p>
+		        <p><i class="fa fa-star"></i><i class="fa fa-star-half-o"></i></p>
+		        <p><a href="{{STATIC_URL}}recipe_view.html" class="btn btn-primary" role="button">View detail</a> <a href="" class="btn btn-default" role="button">Button</a></p>
+		      </div>
+		    </div>
+		  </div>
+
+		  <div class="col-sm-3 col-md-2">
+		    <div class="thumbnail">
+		      <img src="{{STATIC_URL}}img/guotie.jpg" alt="...">
+		      <div class="caption">
+		        <h3>Thumbnail label</h3>
+		        <p>Short description of the dish</p>
+		        <p>From <a>Xing Chen</a></p>
+		        <p><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-o"></i></p>
+		        <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+		      </div>
+		    </div>
+		  </div>
+
+		  <div class="col-sm-3 col-md-2">
+		    <div class="thumbnail">
+		      <img src="{{STATIC_URL}}img/chicken.jpg" alt="...">
+		      <div class="caption">
+		        <h3>Thumbnail label</h3>
+		        <p>Short description of the dish</p>
+		        <p>From <a>Xing Chen</a></p>
+		        <p><i class="fa fa-star"></i><i class="fa fa-star-half-o"></i></p>
+		        <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+		      </div>
+		    </div>
+		  </div>
+
+		  <div class="col-sm-3 col-md-2">
+		    <div class="thumbnail">
+		      <img src="{{STATIC_URL}}img/huoguo.jpg" alt="...">
+		      <div class="caption">
+		        <h3>Thumbnail label</h3>
+		        <p>Short description of the dish</p>
+		        <p>From <a>Xing Chen</a></p>
+		        <p><i class="fa fa-star"></i><i class="fa fa-star-half-o"></i></p>
+		        <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+		      </div>
+		    </div>
+		  </div>
+		  <div class="col-sm-3 col-md-2">
+		    <div class="thumbnail">
+		      <img src="{{STATIC_URL}}img/friedrice.jpg" alt="...">
+		      <div class="caption">
+		        <h3>Thumbnail label</h3>
+		        <p>Short description of the dish</p>
+		        <p>From <a>Xing Chen</a></p>
+		        <p><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-o"></i></p>
+		        <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+		      </div>
+		    </div>
+		  </div>
+
+		<div class="col-sm-3 col-md-2">
+			    <div class="thumbnail">
+			      <img src="{{STATIC_URL}}img/xia.jpg" alt="...">
+			      <div class="caption">
+			        <h3>Thumbnail label</h3>
+			        <p>Short description of the dish</p>
+			        <p>From <a>Xing Chen</a></p>
+			        <p><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-o"></i></p>
+			        <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+			      </div>
+			    </div>
+			  </div>
+
+		</div>
+	</div>
+</div>
+
+
+{% if logged_in == True %}
+<!--end of top recommended -->
+<div class="panel panel-default">
+		<div class="panel-heading"><h3>Especially For You!    <a>More</a></h3></div>
+		<div class="panel-body">
+		<div class="row">
+		  <div class="col-sm-3 col-md-2">
+		    <div class="thumbnail">
+		      <img src="{{STATIC_URL}}img/huoguo.jpg" alt="...">
+		      <div class="caption">
+		        <h3>Thumbnail label</h3>
+		        <p>...</p>
+		        <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+		      </div>
+		    </div>
+		  </div>
+
+		  <div class="col-sm-3 col-md-2">
+		    <div class="thumbnail">
+		      <img src="{{STATIC_URL}}img/chicken.jpg" alt="...">
+		      <div class="caption">
+		        <h3>Thumbnail label</h3>
+		        <p>...</p>
+		        <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+		      </div>
+		    </div>
+		  </div>
+
+		  <div class="col-sm-3 col-md-2">
+		    <div class="thumbnail">
+		      <img src="{{STATIC_URL}}img/xia.jpg" alt="...">
+		      <div class="caption">
+		        <h3>Thumbnail label</h3>
+		        <p>...</p>
+		        <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+		      </div>
+		    </div>
+		  </div>
+		  <div class="col-sm-3 col-md-2">
+		    <div class="thumbnail">
+		      <img src="{{STATIC_URL}}img/chaomian.jpg" alt="...">
+		      <div class="caption">
+		        <h3>Thumbnail label</h3>
+		        <p>...</p>
+		        <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+		      </div>
+		    </div>
+		  </div>
+		  <div class="col-sm-3 col-md-2">
+		    <div class="thumbnail">
+		      <img src="{{STATIC_URL}}img/chayedan.jpg" alt="...">
+		      <div class="caption">
+		        <h3>Thumbnail label</h3>
+		        <p>...</p>
+		        <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+		      </div>
+		    </div>
+		  </div>
+		  <div class="col-sm-3 col-md-2">
+		    <div class="thumbnail">
+		      <img src="{{STATIC_URL}}img/guotie.jpg" alt="...">
+		      <div class="caption">
+		        <h3>Thumbnail label</h3>
+		        <p>...</p>
+		        <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+	</div>
+</div>
+{% endif %}
+
+<div class="panel panel-default">
+		<div class="panel-heading"><h3>Top of the MONTH!    <a>More</a></h3></div>
+		<div class="panel-body">
+		<div class="row">
+		{% for topm in monthly %}
+		  <div class="col-sm-3 col-md-2">
+		    <div class="thumbnail">
+		      <img src="/foodchaser/recipe/photo/{{topm.recipe.id}}" width='200px'>
+		      <div class="caption">
+		      	<h3>Top {{topm.count}}</h3>
+		        <h3>{{topm.recipe.name}}</h3>
+		        <p>Rating: {{topm.average_rating}}</p>
+		        <p><a href="/foodchaser/recipe_view/{{topm.recipe.id}}" class="btn btn-primary" role="button">View Recipe</a>
+		      </div>
+		    </div>
+		  </div>
+		{% endfor %}
+
+<!-- 		  <div class="col-sm-3 col-md-2">
+		    <div class="thumbnail">
+		      <img src="{{STATIC_URL}}img/chicken.jpg" alt="...">
+		      <div class="caption">
+		        <h3>Thumbnail label</h3>
+		        <p>...</p>
+		        <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+		      </div>
+		    </div>
+		  </div>
+
+		  <div class="col-sm-3 col-md-2">
+		    <div class="thumbnail">
+		      <img src="{{STATIC_URL}}img/xia.jpg" alt="...">
+		      <div class="caption">
+		        <h3>Thumbnail label</h3>
+		        <p>...</p>
+		        <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+		      </div>
+		    </div>
+		  </div>
+		  <div class="col-sm-3 col-md-2">
+		    <div class="thumbnail">
+		      <img src="../static/img/chaomian.jpg" alt="...">
+		      <div class="caption">
+		        <h3>Thumbnail label</h3>
+		        <p>...</p>
+		        <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+		      </div>
+		    </div>
+		  </div>
+		  <div class="col-sm-3 col-md-2">
+		    <div class="thumbnail">
+		      <img src="../static/img/chayedan.jpg" alt="...">
+		      <div class="caption">
+		        <h3>Thumbnail label</h3>
+		        <p>...</p>
+		        <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+		      </div>
+		    </div>
+		  </div>
+		  <div class="col-sm-3 col-md-2">
+		    <div class="thumbnail">
+		      <img src="../static/img/guotie.jpg" alt="...">
+		      <div class="caption">
+		        <h3>Thumbnail label</h3>
+		        <p>...</p>
+		        <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+		      </div>
+		    </div>
+		  </div> -->
+		</div>
+	</div>
+</div>
+
+<div class="panel panel-default">
+		<div class="panel-heading"><h3>Top of the SEASON!    <a>More</a></h3></div>
+		<div class="panel-body">
+		<div class="row">
+		{% for tops in seasonal %}
+		  <div class="col-sm-3 col-md-2">
+		    <div class="thumbnail">
+		      <img src="/foodchaser/recipe/photo/{{tops.recipe.id}}" width='200px'>
+		      <div class="caption">
+		      	<h3>Top {{tops.count}}</h3>
+		        <h3>{{tops.recipe.name}}</h3>
+		        <p>Rating: {{tops.average_rating}}</p>
+		        <p><a href="/foodchaser/recipe_view/{{tops.recipe.id}}" class="btn btn-primary" role="button">View Recipe</a>
+		      </div>
+		    </div>
+		  </div>
+		{% endfor %}
+		  <!-- <div class="col-sm-3 col-md-2">
+		    <div class="thumbnail">
+		      <img src="../static/img/laziji.jpg" alt="...">
+		      <div class="caption">
+		        <h3>Thumbnail label</h3>
+		        <p>...</p>
+		        <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+		      </div>
+		    </div>
+		  </div>
+
+		  		  <div class="col-sm-3 col-md-2">
+		    <div class="thumbnail">
+		      <img src="../static/img/chicken.jpg" alt="...">
+		      <div class="caption">
+		        <h3>Thumbnail label</h3>
+		        <p>...</p>
+		        <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+		      </div>
+		    </div>
+		  </div>
+
+		  <div class="col-sm-3 col-md-2">
+		    <div class="thumbnail">
+		      <img src="../static/img/xia.jpg" alt="...">
+		      <div class="caption">
+		        <h3>Thumbnail label</h3>
+		        <p>...</p>
+		        <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+		      </div>
+		    </div>
+		  </div>
+		  <div class="col-sm-3 col-md-2">
+		    <div class="thumbnail">
+		      <img src="../static/img/chaomian.jpg" alt="...">
+		      <div class="caption">
+		        <h3>Thumbnail label</h3>
+		        <p>...</p>
+		        <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+		      </div>
+		    </div>
+		  </div>
+		  <div class="col-sm-3 col-md-2">
+		    <div class="thumbnail">
+		      <img src="../static/img/chayedan.jpg" alt="...">
+		      <div class="caption">
+		        <h3>Thumbnail label</h3>
+		        <p>...</p>
+		        <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+		      </div>
+		    </div>
+		  </div>
+		  <div class="col-sm-3 col-md-2">
+		    <div class="thumbnail">
+		      <img src="../static/img/guotie.jpg" alt="...">
+		      <div class="caption">
+		        <h3>Thumbnail label</h3>
+		        <p>...</p>
+		        <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+		      </div>
+		    </div>
+		  </div> -->
+		</div>
+	</div>
+</div>
+
+                      <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                      	<div class="modal-dialog">
+    						<div class="modal-content">
+      							<div class="modal-header">
+        							<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        							<h4 class="modal-title" id="myModalLabel">Please register</h4>
+      							</div>
+      						<div class="modal-body">
+
+      						<form method="post" autocomplete="on" action="/foodchaser/register"> 
+                                <h1> Register </h1> 
+                                <p> 
+                                    <label for="usernamesignup" class="uname" data-icon="u">Your username</label>
+                                    <input id="usernamesignup" name="register_username" required="required" type="text" placeholder="mysuperusername690" />
+                                </p>
+                                <p> 
+                                    <label for="emailsignup" class="youmail" data-icon="e" > Your email</label>
+                                    <input id="emailsignup" name="register_email" required="required" type="email" placeholder="mysupermail@mail.com"/> 
+                                </p>
+                                <p> 
+                                    <label for="passwordsignup" class="youpasswd" data-icon="p">Your password </label>
+                                    <input id="passwordsignup" name="register_password" required="required" type="password" placeholder="eg. X8df!90EO"/>
+                                </p>
+                                <p> 
+                                    <label for="passwordsignup_confirm" class="youpasswd" data-icon="p">Please confirm your password </label>
+                                    <input id="passwordsignup_confirm" name="register_password_confirm" required="required" type="password" placeholder="eg. X8df!90EO"/>
+                                </p>
+                                <p class="signin button"> 
+                                    <input type="submit" value="Register"/> 
+                                </p>
+                                {% csrf_token %}
+                            </form>
+
+     					 	</div>
+      						<div class="modal-footer">
+        						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      						</div>
+    						</div>
+  							</div>
+					 </div>
+
+</body>
+      
+<div class="navbar navbar-default navbar-fixed-bottom" role="navigation">
+          <div class="container">
+              <div class="navbar-text pull-left">
+                  <p>This is a footer for future use</p>
+              </div>
+          </div>
+      </div>
+    
+</html>
+
